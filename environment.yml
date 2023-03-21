@@ -1,8 +1,0 @@
-name: py311
-channels:
-  - defaults
-dependencies:
-  - python=3.11
-  - flake8
-  - pytest
-prefix: /home/katikov/anaconda3/envs/py311
