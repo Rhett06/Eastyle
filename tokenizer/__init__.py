@@ -1,0 +1,3 @@
+
+def tokenize(str):
+    return ""
