@@ -55,7 +55,7 @@ for proj in projs:
                 with open(violationFile, "r") as f:
                     violations = json.load(f)
             except Exception:
-                pass
+                continue
 
             for violation in violations:
                 rule = violation["source"].split(".")[-1][:-5]

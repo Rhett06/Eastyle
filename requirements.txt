@@ -2,10 +2,13 @@ attrs==22.2.0
 exceptiongroup==1.1.1
 flake8==6.0.0
 iniconfig==2.0.0
+-e git+https://github.com/bloriot97/javalang.git@37ac7f4d7e859a859a6914b733dac59e8c32282f#egg=javalang
 mccabe==0.7.0
 packaging==23.0
 pluggy==1.0.0
 pycodestyle==2.10.0
 pyflakes==3.0.1
 pytest==7.2.2
+six==1.16.0
 tomli==2.0.1
+tqdm==4.65.0
