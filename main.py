@@ -1,6 +1,6 @@
 import argparse
 import os
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup #parse xml
 import json
 import javalang
 import checkstyle
@@ -64,7 +64,7 @@ if __name__ == "__main__":
                 code = f.read()
             with open(checkstyleConfigFile, "r") as f:
                 checkstyleData = f.read()
-                checkstyleData = BeautifulSoup(checkstyleData, "xml")
+                checkstyleData = BeautifulSoup(checkstyleData, "xml") # xml -> java
             try:
                 with open(violationFile, "r") as f:
                     violations = json.load(f)
@@ -85,7 +85,6 @@ if __name__ == "__main__":
                 result[rule]["success"] += 1
             else:
                 result[rule]["fail"] += 1
-
     print(result)
 
             
