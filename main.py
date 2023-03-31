@@ -4,8 +4,9 @@ from bs4 import BeautifulSoup #parse xml
 import json
 import javalang
 import checkstyle
+import tqdm
 
-from tokenizer.tokenizer import tokenize_file, tokenize_violation
+from tokenizer.tokenizer import tokenize_file, tokenize_violation, tokenize_with_white_space, de_tokenize
 from utils import getViolationType
 
 violationRules = {"NewlineAtEndOfFile"}
@@ -16,19 +17,22 @@ tempDir = "temp"
 def fixViolations(code: str, violations: list, checkstyleData: BeautifulSoup) -> str:
     fixList = [] 
     codeLines = code.split("\n")
-    tokens = None # TODO: tokenize & fix
+    whitespace, tokens, whitespaceStr = tokenize_with_white_space(code)
     
     for violation in violations:
         violationType = getViolationType(violation)
         if violationType not in violationRules:
             continue
         if violationType == "NewlineAtEndOfFile":
-            fixList.append({"violation": violationType}) # TODO: modify the last token
+            fixList.append({"violation": violationType})
+            indent = -sum([i[1] for i in whitespace[:-1] if i[0]>0])
+            whitespace[-1] = (1, indent, whitespace[-1][2])
     
-    # TODO: de-tokenize
-    for i in fixList:
-        if i["violation"] == "NewlineAtEndOfFile":
-            code = code + "\n"
+
+    # for i in fixList:
+    #     if i["violation"] == "NewlineAtEndOfFile":
+    #         code = code + "\n"
+    code = de_tokenize(code, whitespace)
 
     return code
 
@@ -54,7 +58,7 @@ if __name__ == "__main__":
         # import random
         # random.shuffle(dataset)
         # dataset =  dataset[:100]
-        for data in dataset:
+        for data in tqdm.tqdm(dataset):
             checkstyleConfigFile = os.path.join(data, "checkstyle.xml")
             codeFile = os.path.join(data, "code.java")
             infoFile = os.path.join(data, "info.json")
@@ -85,6 +89,8 @@ if __name__ == "__main__":
                 result[rule]["success"] += 1
             else:
                 result[rule]["fail"] += 1
+                print(data)
+                exit()
     print(result)
 
             
