@@ -1,11 +1,22 @@
 attrs==22.2.0
+beautifulsoup4==4.12.0
+certifi==2022.12.7
+charset-normalizer==3.1.0
 exceptiongroup==1.1.1
 flake8==6.0.0
+idna==3.4
 iniconfig==2.0.0
+-e git+https://github.com/bloriot97/javalang.git@37ac7f4d7e859a859a6914b733dac59e8c32282f#egg=javalang
+lxml==4.9.2
 mccabe==0.7.0
 packaging==23.0
 pluggy==1.0.0
 pycodestyle==2.10.0
 pyflakes==3.0.1
 pytest==7.2.2
+requests==2.28.2
+six==1.16.0
+soupsieve==2.4
 tomli==2.0.1
+tqdm==4.65.0
+urllib3==1.26.15
