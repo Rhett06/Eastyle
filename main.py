@@ -1,42 +1,44 @@
 import argparse
 import os
-from bs4 import BeautifulSoup #parse xml
+from bs4 import BeautifulSoup  # parse xml
 import json
 import javalang
 import checkstyle
 import tqdm
 
 from tokenizer.tokenizer import tokenize_file, tokenize_violation, tokenize_with_white_space, de_tokenize
-from utils import getViolationType
+from utils import get_violation_type
 
-violationRules = {"NewlineAtEndOfFile"}
+from violationFixes import (
+    fixNewlineAtEndOfFile, fixNoLineWrap, fixEmptyForIteratorPad, fixLeftCurly,
+    fixOneStatementPerLine, fixCommentsIndentation
+)
+
+violationRules = {"CommentsIndentation"}
 
 tempDir = "temp"
 
+
 # return a list of fixes
-def fixViolations(code: str, violations: list, checkstyleData: BeautifulSoup) -> str:
-    fixList = [] 
+def fix_violations(code: str, violations: list, checkstyleData: BeautifulSoup) -> str:
     codeLines = code.split("\n")
-    whitespace, tokens, whitespaceStr = tokenize_with_white_space(code)
-    
+    whitespace, tokens, whitespace_str = tokenize_with_white_space(code)
+    # for i in range(30):
+    #    print(tokens[i].value, len(tokens[i].value), whitespace[i], f"*{whitespace_str[i]}*")
     for violation in violations:
-        violationType = getViolationType(violation)
-        if violationType not in violationRules:
+        # print(violation)
+        # print(type(tokens[0]))
+        violation_type = get_violation_type(violation)
+        args = {"violation": violation, "tokens": tokens, "whitespace": whitespace, "checkstyleData":checkstyleData}
+        if violation_type not in violationRules:
             continue
-        if violationType == "NewlineAtEndOfFile":
-            fixList.append({"violation": violationType})
-            indent = -sum([i[1] for i in whitespace[:-1] if i[0]>0])
-            whitespace[-1] = (1, indent, whitespace[-1][2])
-    
-
-    # for i in fixList:
-    #     if i["violation"] == "NewlineAtEndOfFile":
-    #         code = code + "\n"
+        whitespace = globals()["fix"+violation_type](**args)
+    # print(type(violation))
+    # print(whitespace)
     code = de_tokenize(code, whitespace)
-
+    # print(whitespace)
+    # print(code)
     return code
-
-
 
 
 if __name__ == "__main__":
@@ -55,10 +57,16 @@ if __name__ == "__main__":
         rulePath = os.path.join(dataPath, rule)
         dataset = os.listdir(rulePath)
         dataset = [os.path.join(rulePath, i) for i in dataset]
-        # import random
-        # random.shuffle(dataset)
-        # dataset =  dataset[:100]
+        import random
+
+        random.shuffle(dataset)
+        dataset = dataset[:100]
+        # dataset = ["../data-by-rule/EmptyForIteratorPad/1"]
+
+        #dataset = ["../data-by-rule/EmptyForIteratorPad/2073"]
+        #dataset = ["../data-by-rule/OneStatementPerLine/25"]  # 33 184 63
         for data in tqdm.tqdm(dataset):
+            # print(data)
             checkstyleConfigFile = os.path.join(data, "checkstyle.xml")
             codeFile = os.path.join(data, "code.java")
             infoFile = os.path.join(data, "info.json")
@@ -68,7 +76,7 @@ if __name__ == "__main__":
                 code = f.read()
             with open(checkstyleConfigFile, "r") as f:
                 checkstyleData = f.read()
-                checkstyleData = BeautifulSoup(checkstyleData, "xml") # xml -> java
+                checkstyleData = BeautifulSoup(checkstyleData, "xml")  # xml -> java
             try:
                 with open(violationFile, "r") as f:
                     violations = json.load(f)
@@ -76,22 +84,22 @@ if __name__ == "__main__":
                 continue
             with open(infoFile, "r") as f:
                 info = json.load(f)
-            
+
             checkstyleJar = info["checkstyle_jar"]
+            # print(checkstyleJar)
             checkstyleJar = os.path.join("jars", checkstyleJar)
-            fixed = fixViolations(code, violations, checkstyleData)
+            fixed = fix_violations(code, violations, checkstyleData)
             tempCodeFile = os.path.join(tempDir, "output.java")
             with open(tempCodeFile, "w") as f:
                 f.write(fixed)
             newViolations = checkstyle.check(tempCodeFile, checkstyleConfigFile, checkstyleJar)
-            remaining = [i for i in newViolations if getViolationType(i) == rule]
+            # print(newViolations)
+            remaining = [i for i in newViolations if get_violation_type(i) == rule]
+            # print(remaining)
             if len(remaining) == 0:
                 result[rule]["success"] += 1
             else:
                 result[rule]["fail"] += 1
                 print(data)
-                exit()
+                # exit()
     print(result)
-
-            
-

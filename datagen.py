@@ -8,7 +8,7 @@ if not os.path.exists(outputDir):
     os.mkdir(outputDir)
 
 violationRules = ["CommentsIndentation", "EmptyForIteratorPad", "EmptyLineSeparator", "FileTabCharacter", "GenericWhitespace", "Indentation", 
-            "LeftCurly", "LineLength", "MethodParamPad", "NoLineWrap", "NoWhitespaceAfter", "NoWhitespaceBefore", "OneStatementPerLine",
+            "LeftCurly.py", "LineLength", "MethodParamPad", "NoLineWrap", "NoWhitespaceAfter", "NoWhitespaceBefore", "OneStatementPerLine",
             "OperatorWrap", "ParenPad", "Regexp", "RegexpMultiline", "RegexpSingleline", "RegexpSinglelineJava", "RightCurly", "SeparatorWrap",
             "SingleSpaceSeparator", "TrailingComment", "WhitespaceAfter", "WhitespaceAround", "NewlineAtEndOfFile"]
 violationCountDict = {}
