@@ -2,6 +2,8 @@ from typing import Union
 
 
 def locate_token(tokens: list, line: int, col: int = 0, lowerbound: bool = True) -> Union[int, None]:
+    if line == 1: # fix javalang -1 error in the first line
+        col -= 1 
     if lowerbound:
         for i in range(len(tokens)):
             if tokens[i].position[0] > line or (tokens[i].position[0] == line and tokens[i].position[1] >= col):
