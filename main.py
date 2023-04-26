@@ -12,10 +12,11 @@ from utils import get_violation_type
 from violationFixes import (
     fixNewlineAtEndOfFile, fixNoLineWrap, fixEmptyForIteratorPad, fixLeftCurly,
     fixOneStatementPerLine, fixCommentsIndentation, fixNoWhitespaceAfter,
-    fixNoWhitespaceBefore,fixWhitespaceAfter,
+    fixNoWhitespaceBefore,fixWhitespaceAfter, fixFileTabCharacter, fixGenericWhitespace,
+    fixEmptyLineSeparator
 )
 
-violationRules = {"WhitespaceAfter"}
+violationRules = {"EmptyLineSeparator"}
 
 tempDir = "temp"
 
@@ -64,7 +65,7 @@ if __name__ == "__main__":
 
         random.shuffle(dataset)
         dataset = dataset[:100]
-        # dataset = ["../data-by-rule/WhitespaceAfter/18624"] # 18624 40781
+        # dataset = ["../data-by-rule/EmptyLineSeparator/82768"]  #    
 
         #dataset = ["../data-by-rule/EmptyForIteratorPad/2073"]
         #dataset = ["../data-by-rule/OneStatementPerLine/25"]  # 33 184 63
@@ -101,7 +102,7 @@ if __name__ == "__main__":
                 newViolations = checkstyle.check(tempCodeFile, checkstyleConfigFile, checkstyleJar)
                 # print(newViolations)
                 remaining = [i for i in newViolations if get_violation_type(i) == rule]
-                            
+                
                 if len(remaining) == 0 or violations == remaining:
                     break
                 code = fixed

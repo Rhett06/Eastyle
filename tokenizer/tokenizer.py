@@ -78,7 +78,7 @@ def tokenize_with_white_space(code: str) -> Tuple[list, list, list]:
                     space_type = 'None'
                 if True: # relative
                     spaces = next_token_position[1] - indentation_last_line
-                    whitespace.append((next_token_position[0] - end_of_token[0] - tokens[index].value.count('\n'), spaces, space_type))
+                    whitespace.append((next_token_position[0] - end_of_token[0], spaces, space_type))
                     temp = file_content_lines[end_of_token[0]-1][end_of_token[1]-1:] + "\n"
                     for i in range(end_of_token[0], next_token_position[0]-1):
                         temp += file_content_lines[i] + "\n"
