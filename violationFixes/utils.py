@@ -2,6 +2,7 @@ from typing import Union
 
 
 def locate_token(tokens: list, line: int, col: int = 0, lowerbound: bool = True) -> Union[int, None]:
+    # TODO: binary search
     if line == 1: # fix javalang -1 error in the first line
         col -= 1 
     if lowerbound:

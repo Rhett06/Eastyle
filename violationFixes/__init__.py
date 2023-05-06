@@ -16,8 +16,8 @@ from .MethodParamPad import fixMethodParamPad
 from .OperatorWrap import fixOperatorWrap
 from .ParenPad import fixParenPad
 from .RightCurly import fixRightCurly
-# from .SeparatorWrap import fixSeparatorWrap
-# from .SingleSpaceSeparator import fixSingleSpaceSeparator
-# from .TrailingComment import fixTrailingComment
-# from .WhitespaceAround import fixWhitespaceAround
+from .SeparatorWrap import fixSeparatorWrap
+from .SingleSpaceSeparator import fixSingleSpaceSeparator
+from .TrailingComment import fixTrailingComment
+from .WhitespaceAround import fixWhitespaceAround
 

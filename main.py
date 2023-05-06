@@ -14,10 +14,11 @@ from violationFixes import (
     fixOneStatementPerLine, fixCommentsIndentation, fixNoWhitespaceAfter,
     fixNoWhitespaceBefore,fixWhitespaceAfter, fixFileTabCharacter, fixGenericWhitespace,
     fixEmptyLineSeparator, fixIndentation, fixLineLength, fixMethodParamPad,
-    fixOperatorWrap, fixParenPad, fixRightCurly
+    fixOperatorWrap, fixParenPad, fixRightCurly, fixSeparatorWrap, 
+    fixSingleSpaceSeparator, fixTrailingComment, fixWhitespaceAround
 )
 
-violationRules = {"RightCurly"}
+violationRules = {"WhitespaceAround"}
 
 tempDir = "temp"
 
@@ -66,7 +67,7 @@ if __name__ == "__main__":
 
         random.shuffle(dataset)
         dataset = dataset[:100]
-        dataset = ["../data-by-rule/RightCurly/908"]  #  15398  20317  21338 14489
+        # dataset = ["../data-by-rule/WhitespaceAround/26741"] #  27098 73797
 
         #dataset = ["../data-by-rule/EmptyForIteratorPad/2073"]
         #dataset = ["../data-by-rule/OneStatementPerLine/25"]  # 33 184 63
