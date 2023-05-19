@@ -6,11 +6,14 @@ dataDir = "../data"
 outputDir = "../data-by-rule"
 if not os.path.exists(outputDir):
     os.mkdir(outputDir)
+"""
 
 violationRules = ["CommentsIndentation", "EmptyForIteratorPad", "EmptyLineSeparator", "FileTabCharacter", "GenericWhitespace", "Indentation", 
             "LeftCurly.py", "LineLength", "MethodParamPad", "NoLineWrap", "NoWhitespaceAfter", "NoWhitespaceBefore", "OneStatementPerLine",
             "OperatorWrap", "ParenPad", "Regexp", "RegexpMultiline", "RegexpSingleline", "RegexpSinglelineJava", "RightCurly", "SeparatorWrap",
             "SingleSpaceSeparator", "TrailingComment", "WhitespaceAfter", "WhitespaceAround", "NewlineAtEndOfFile"]
+"""
+violationRules = ["AnnotationLocation", "AnnotationOnSameLine", "EmptyForInitializerPad", "TypecastParenPad"]
 violationCountDict = {}
 for i in violationRules:
     violationCountDict[i] = 0

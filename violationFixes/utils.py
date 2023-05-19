@@ -1,5 +1,21 @@
 from typing import Union
 
+def find_rightpar(tokens: list, token_id: int) -> Union[int, None]:
+    match_dict = {"{": "}", "(": ")", "[": "]"}
+    token_str = tokens[token_id].value
+    if token_str not in match_dict:
+        return None
+    
+    rightpar_id = token_id + 1
+    while rightpar_id < len(tokens):
+        if tokens[rightpar_id].value == match_dict[token_str]:
+            return rightpar_id
+        if tokens[rightpar_id].value == token_str:
+            rightpar_id = find_rightpar(tokens, rightpar_id)
+
+        rightpar_id += 1
+        
+    return None
 
 def locate_token(tokens: list, line: int, col: int = 0, lowerbound: bool = True) -> Union[int, None]:
     # TODO: binary search

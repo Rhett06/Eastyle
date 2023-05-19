@@ -20,4 +20,5 @@ from .SeparatorWrap import fixSeparatorWrap
 from .SingleSpaceSeparator import fixSingleSpaceSeparator
 from .TrailingComment import fixTrailingComment
 from .WhitespaceAround import fixWhitespaceAround
-
+from .AnnotationLocation import fixAnnotationLocation
+from .TypecastParenPad import fixTypecastParenPad

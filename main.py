@@ -15,10 +15,11 @@ from violationFixes import (
     fixNoWhitespaceBefore,fixWhitespaceAfter, fixFileTabCharacter, fixGenericWhitespace,
     fixEmptyLineSeparator, fixIndentation, fixLineLength, fixMethodParamPad,
     fixOperatorWrap, fixParenPad, fixRightCurly, fixSeparatorWrap, 
-    fixSingleSpaceSeparator, fixTrailingComment, fixWhitespaceAround
+    fixSingleSpaceSeparator, fixTrailingComment, fixWhitespaceAround,
+    fixAnnotationLocation, fixTypecastParenPad
 )
 
-violationRules = {"WhitespaceAround"}
+violationRules = {"TypecastParenPad"}
 
 tempDir = "temp"
 
@@ -67,7 +68,7 @@ if __name__ == "__main__":
 
         random.shuffle(dataset)
         dataset = dataset[:100]
-        # dataset = ["../data-by-rule/WhitespaceAround/26741"] #  27098 73797
+        # dataset = ["../data-by-rule/TypecastParenPad/1354"] #  27098 73797
 
         #dataset = ["../data-by-rule/EmptyForIteratorPad/2073"]
         #dataset = ["../data-by-rule/OneStatementPerLine/25"]  # 33 184 63
