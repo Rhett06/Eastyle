@@ -10,7 +10,7 @@ def fixNoLineWrap(violation: dict,tokens: list, whitespace: list, **kwargs) -> l
             token_id = i
             break
     indent = whitespace[token_id-1][1]
-    whitespace[token_id-1] = (0,0,"None")
+    whitespace[token_id-1] = (0,1,"SP")
     for i in range(token_id, len(tokens)):
         if whitespace[i][0] > 0:
             whitespace[i] = (whitespace[i][0], whitespace[i][1]+indent, whitespace[i][2])

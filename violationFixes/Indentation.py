@@ -15,7 +15,7 @@ def fixIndentation(violation: dict,tokens: list, whitespace: list, checkstyleDat
     
     
     msg = violation["message"]
-    print(msg)
+    # print(msg)
     indent_prefix = "has incorrect indentation level "
     new_indent_prefix = ["expected level should be one of the following: ", "expected level should be "]
     # expected level should be one of the following: 6, 8, 10.
@@ -27,7 +27,7 @@ def fixIndentation(violation: dict,tokens: list, whitespace: list, checkstyleDat
             pos_new_indent += len(s)
             break
     
-    print(msg[pos_indent:], msg[pos_new_indent:])
+    # print(msg[pos_indent:], msg[pos_new_indent:])
     def next_int(s: str) -> int:
         return int(''.join(takewhile(str.isdigit, s)))
     indent = next_int(msg[pos_indent:])
