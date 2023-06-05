@@ -7,8 +7,9 @@ import javalang
 import checkstyle
 import tqdm
 from typing import Tuple, Union
+import copy
 
-from tokenizer.tokenizer import tokenize_file, tokenize_violation, tokenize_with_white_space, de_tokenize
+from tokenizer.tokenizer import tokenize_file, tokenize_violation, tokenize_with_white_space, de_tokenize, reformat
 from utils import get_violation_type, load_file, save_file
 
 from violationFixes import (
@@ -33,7 +34,7 @@ tempDir = "temp"
 def fix_violations_step(code: str, violations: list, checkstyleData: BeautifulSoup) -> str:
     codeLines = code.split("\n")
     whitespace, tokens, whitespace_str = tokenize_with_white_space(code)
-
+    violating_whitespace = copy.deepcopy(whitespace)
     # for i in range(30):
     #    print(tokens[i].value, len(tokens[i].value), whitespace[i], f"*{whitespace_str[i]}*")
     for violation in violations:
@@ -47,7 +48,8 @@ def fix_violations_step(code: str, violations: list, checkstyleData: BeautifulSo
     # print(type(violation))
     # print(whitespace)
 
-    code = de_tokenize(code, whitespace)
+    # code = de_tokenize(code, whitespace)
+    code = reformat(whitespace, violating_whitespace, tokens, whitespace_str)
     # print(whitespace)
     # print(code)
     return code
@@ -105,7 +107,7 @@ if __name__ == "__main__":
         # random.shuffle(dataset)
         # dataset = dataset[:1]
         # print(dataset)
-        # dataset = ["../data-by-rule/NoLineWrap/12"]
+        # dataset = ["../data-by-rule/FileTabCharacter/1330"] # 201 860 1675 977
         for data in tqdm.tqdm(dataset):
             # print(data)
             checkstyleConfigFile = os.path.join(data, "checkstyle.xml")
