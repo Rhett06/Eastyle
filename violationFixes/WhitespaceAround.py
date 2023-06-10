@@ -14,6 +14,7 @@ def fixWhitespaceAround(violation: dict, tokens: list, whitespace: list, checkst
     if token_name == "typecast":
         token_name = ")"
 
+    # print(tokens[token_id])
     if tokens[token_id].value == token_name:
         pass
     elif token_id > 0 and tokens[token_id-1].value == token_name:
@@ -21,6 +22,7 @@ def fixWhitespaceAround(violation: dict, tokens: list, whitespace: list, checkst
     elif token_id > 0 and tokens[token_id+1].value == token_name:
         token_id += 1
     else:
+
         return whitespace
     # print(token_name,tokens[token_id].value, tokens[token_id])
 

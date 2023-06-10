@@ -1,8 +1,9 @@
 from itertools import takewhile
-from .utils import locate_token, next_nl
+from .utils import locate_token, next_nl, get_indent_type
 
 def fixCommentsIndentation (violation: dict, tokens: list, whitespace: list, **kwargs) -> list:
     msg = violation["message"]
+    #print(msg)
     line = int(violation["line"])
     comment_id = locate_token(tokens, line)
 
@@ -22,11 +23,16 @@ def fixCommentsIndentation (violation: dict, tokens: list, whitespace: list, **k
         indent = next_int(msg[pos_indent:])
         new_indent = next_int(msg[pos_new_indent:])
         indent_diff = new_indent - indent
+        new_ws = get_indent_type(whitespace) if whitespace[indent_id][2] == "None" else whitespace[indent_id][2]
+        #print(new_ws)
         whitespace[indent_id] = (whitespace[indent_id][0],
-                                 whitespace[indent_id][1] + indent_diff, whitespace[indent_id][2])
+                                 whitespace[indent_id][1] + indent_diff, new_ws)
+
+        new_ws = get_indent_type(whitespace) if whitespace[next_indent_id][2] == "None" else whitespace[next_indent_id][2]
+        #print(new_ws)
         if next_indent_id:
             whitespace[next_indent_id] = (whitespace[next_indent_id][0],
-                                          whitespace[next_indent_id][1] - indent_diff, whitespace[next_indent_id][2])
+                                          whitespace[next_indent_id][1] - indent_diff, new_ws)
 
     else:  # TODO: find indent manually
         pass

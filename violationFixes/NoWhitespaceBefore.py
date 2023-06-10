@@ -1,3 +1,4 @@
+import javalang.tokenizer
 from bs4 import BeautifulSoup
 from .utils import locate_token, next_nl
 
@@ -25,13 +26,15 @@ def fixNoWhitespaceBefore(violation: dict, tokens: list, whitespace: list, check
     # print(tokens[token_id].value, token_name)
     
     whitespace_id = token_id - 1
-    if whitespace[whitespace_id][0] > 0: 
-        indent = whitespace[whitespace_id][1]
-        whitespace[whitespace_id] = (0, 0, whitespace[whitespace_id][2])
-        nl_id = next_nl(whitespace, whitespace_id)
-        if nl_id:
-            whitespace[nl_id] = (whitespace[nl_id][0], whitespace[nl_id][1]+indent, whitespace[nl_id][2])
+    if whitespace[whitespace_id][0] > 0:
+        if type(tokens[whitespace_id]) == javalang.tokenizer.Comment  and tokens[whitespace_id].value.startswith("//"):
+            tokens[whitespace_id], tokens[whitespace_id+1] = tokens[whitespace_id+1], tokens[whitespace_id]
+        t = list(whitespace[whitespace_id])
+        if whitespace[whitespace_id+1][1] > 0:
+            t[1] += whitespace[whitespace_id+1][1]
+        whitespace[whitespace_id+1] = tuple(t)
+        whitespace[whitespace_id] = (0, 0, "None")
     else:
-        whitespace[whitespace_id] = (0, 0, whitespace[whitespace_id][2])
+        whitespace[whitespace_id] = (0, 0, "None")
 
     return whitespace

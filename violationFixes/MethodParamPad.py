@@ -10,10 +10,15 @@ def fixMethodParamPad(violation: dict,tokens: list, whitespace: list, **kwargs) 
         return whitespace
     # print(tokens[token_id])
     if whitespace[token_id-1][0] != 0:
-        indent = whitespace[token_id-1][1]
-        nl = next_nl(whitespace, token_id)
+        # indent = whitespace[token_id-1][1]
+        # nl = next_nl(whitespace, token_id)
+        t = list(whitespace[token_id-1])
+        if whitespace[token_id][1] > 0:
+            t[1] += whitespace[token_id][1]
+        whitespace[token_id] = tuple(t)
+
         whitespace[token_id-1] = (0, 0, "None")
-        whitespace[nl] = (whitespace[nl][0], whitespace[nl][1] + indent, whitespace[nl][2])
+        # whitespace[nl] = (whitespace[nl][0], whitespace[nl][1] + indent, whitespace[nl][2])
     elif whitespace[token_id-1][1] != 0:
         whitespace[token_id-1] = (0, 0, "None")
     else:

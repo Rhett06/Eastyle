@@ -3,15 +3,17 @@ from .utils import locate_token, next_nl
 
 
 def fixNoWhitespaceAfter(violation: dict, tokens: list, whitespace: list, checkstyleData: BeautifulSoup, **kwargs) -> list:
-    # print(violation)
+    print(violation)
     line = int(violation["line"])
     col = int(violation["column"])
     token_id = locate_token(tokens, line, col)
     token_name = violation["message"].split("'")
-    # print(tokens[token_id].value)
+    #print(tokens[token_id].value)
     if not token_id or len(token_name) < 2: # TODO: handle error
         return whitespace
     token_name = token_name[1]
+
+    # print(tokens[token_id])
     
     if tokens[token_id].value == token_name and whitespace[token_id][:2] != (0,0):
         pass
@@ -19,7 +21,6 @@ def fixNoWhitespaceAfter(violation: dict, tokens: list, whitespace: list, checks
         token_id -= 1
     else:
         return whitespace
-    
 
     if whitespace[token_id][0] > 0:
         indent = whitespace[token_id][1]

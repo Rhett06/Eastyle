@@ -16,6 +16,7 @@ def fixParenPad(violation: dict, tokens: list, whitespace: list, checkstyleData:
 
     if not token_id:
         return whitespace
+
     if tokens[token_id].value != token_name:
         if token_id > 0 and tokens[token_id-1].value == token_name:
             token_id -= 1
@@ -32,9 +33,17 @@ def fixParenPad(violation: dict, tokens: list, whitespace: list, checkstyleData:
 
     if tokens[token_id].value != token_name:        
         return whitespace
-        
-    if token_name == "(":
+
+    parenConfig = checkstyleData.find(name="module", attrs={"name": "ParenPad"})
+    option = parenConfig.find(name="property", attrs={"name": "option"})
+    option = "nospace" if not option else option.attrs["value"]
+
+    if token_name == ")":
+        token_id -= 1
+
+    if option == "nospace":
         whitespace[token_id] = (0, 0, "None")
     else:
-        whitespace[token_id-1] = (0, 0, "None")
+        whitespace[token_id] = (0, 1, "SP")
+
     return whitespace

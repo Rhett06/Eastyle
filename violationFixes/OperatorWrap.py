@@ -5,7 +5,6 @@ def fixOperatorWrap(violation: dict,tokens: list, whitespace: list, **kwargs) ->
     line = int(violation["line"])
     col = int(violation["column"])
     # print(violation)
-
     token_id = locate_token(tokens, line, col)
     token_name = violation["message"].split("'")
     if not token_id or len(token_name) < 2: # TODO: handle error
@@ -21,13 +20,22 @@ def fixOperatorWrap(violation: dict,tokens: list, whitespace: list, **kwargs) ->
             token_id += 1
         else:
             return whitespace
-    # print(tokens[token_id])
 
-    nl = next_nl(whitespace, token_id)
-    relative_indent = 4 # TODO: get relative indent
-    indent_type = get_indent_type(whitespace)
-    whitespace[token_id-1] = (1, relative_indent, indent_type)
-    whitespace[nl] = (whitespace[nl][0], whitespace[nl][1] - relative_indent, whitespace[nl][2])
+
+    if "previous line" in violation["message"]:
+        t = list(whitespace[token_id-1])
+        if whitespace[token_id][1] > 0:
+            t[1] += whitespace[token_id][1]
+        whitespace[token_id] = tuple(t)
+        whitespace[token_id-1] = (0, 1, "SP")
+
+    else:
+        nl = next_nl(whitespace, token_id)
+        relative_indent = 4 # TODO: get relative indent
+        indent_type = get_indent_type(whitespace)
+        whitespace[token_id-1] = (1, relative_indent, indent_type)
+        whitespace[nl] = (whitespace[nl][0], whitespace[nl][1] - relative_indent, whitespace[nl][2])
 
 
     return whitespace
+

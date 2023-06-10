@@ -5,7 +5,7 @@ from .utils import locate_token, get_indent_type
 def fixIndentation(violation: dict,tokens: list, whitespace: list, checkstyleData: BeautifulSoup, **kwargs) -> list:
     line = int(violation["line"])
     # col = int(violation["column"])
-    # print(violation)
+    print(violation)
     indentConfig = checkstyleData.find(name="module", attrs={"name": "Indentation"})
 
     token_id = locate_token(tokens, line, 0) - 1

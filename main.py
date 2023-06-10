@@ -41,7 +41,7 @@ def fix_violations_step(code: str, violations: list, checkstyleData: BeautifulSo
         # print(violation)
         # print(type(tokens[0]))
         violation_type = get_violation_type(violation)
-        args = {"violation": violation, "tokens": tokens, "whitespace": whitespace, "checkstyleData":checkstyleData}
+        args = {"violation": violation, "tokens": tokens, "whitespace": whitespace, "checkstyleData": checkstyleData}
         if violation_type not in violationRules:
             continue
         whitespace = globals()["fix"+violation_type](**args)
@@ -59,7 +59,6 @@ def fix_violations(code: str, violations: list, checkstyleData: BeautifulSoup, s
     try:
         for _ in range(steps):
             fixed = fix_violations_step(code, violations, checkstyleData)
-            
             tempCodeFile = os.path.join(tempDir, info["filename"]) # TODO: generate an output path
             with open(tempCodeFile, "w") as f:
                 f.write(fixed)
@@ -90,13 +89,14 @@ if __name__ == "__main__":
     parser.add_argument('--rule', help='the tested rule')
     args = parser.parse_args()
     dataPath = args.data
+    fixing_rules = violationRules
     if args.rule is not None:
-        violationRules = {args.rule}
+        fixing_rules = {args.rule}
     os.makedirs(tempDir, exist_ok=True)
 
     result = {}
     checkpoint_file = open("./checkpoint.txt", "w")
-    for rule in violationRules:
+    for rule in fixing_rules:
         print(f"running with rule {rule}...")
         result[rule] = {"success": 0, "same": 0, "new": 0, "same+new": 0, "error": 0}
         rulePath = os.path.join(dataPath, rule)
@@ -107,7 +107,7 @@ if __name__ == "__main__":
         # random.shuffle(dataset)
         # dataset = dataset[:1]
         # print(dataset)
-        # dataset = ["../data-by-rule/FileTabCharacter/1330"] # 201 860 1675 977
+        # dataset = ["../data-by-rule/FileTabCharacter/218"]  # 174 173  142 80 74 143
         for data in tqdm.tqdm(dataset):
             # print(data)
             checkstyleConfigFile = os.path.join(data, "checkstyle.xml")
@@ -141,21 +141,24 @@ if __name__ == "__main__":
 
             new_code, remaining = fix_violations(code, violations, checkstyleData, 10)
 
-            
+            # print(remaining)
             exclude_set = {"JavadocPackage", "PackageDeclaration"}
             remaining = [i for i in remaining if get_violation_type(i) not in exclude_set]
             # print(remaining)
             
             remaining_same = len([i for i in remaining if get_violation_type(i) == rule])
             remaining_new = len([i for i in remaining if get_violation_type(i) != rule])
-            if new_code is None or remaining is None:
+            if any([get_violation_type(i) == "Checker" for i in remaining]):
+                print("result code cannot compile for datapoint: ", data, file=sys.stderr)
+                result[rule]["error"] += 1
+            elif new_code is None or remaining is None:
                 print("error on data point: ", data, file=sys.stderr)
                 result[rule]["error"] += 1
             elif len(remaining) == 0:
                 result[rule]["success"] += 1
             else:
                 print(data, [get_violation_type(i) for i in remaining], file=sys.stderr)
-                # print(remaining)
+                print(remaining)
                 if remaining_same > 0 and remaining_new > 0:
                     result[rule]["same+new"] += 1
                 elif remaining_same > 0:
