@@ -2,18 +2,22 @@ import os
 import json
 import shutil
 
-dataDir = "../data-styler"
-outputDir = "../data-by-rule"
+dataDir = "../data-2"
+outputDir = "../data-by-rule-2"
 if not os.path.exists(outputDir):
     os.mkdir(outputDir)
 
 
 violationRules = ["CommentsIndentation", "EmptyForIteratorPad", "EmptyLineSeparator", "FileTabCharacter", "GenericWhitespace", "Indentation", 
             "LeftCurly", "LineLength", "MethodParamPad", "NoLineWrap", "NoWhitespaceAfter", "NoWhitespaceBefore", "OneStatementPerLine",
-            "OperatorWrap", "ParenPad", "Regexp", "RegexpMultiline", "RegexpSingleline", "RegexpSinglelineJava", "RightCurly", "SeparatorWrap",
+            "OperatorWrap", "ParenPad", 
+            "Regexp", "RegexpMultiline", "RegexpSingleline", "RegexpSinglelineJava",
+            "RightCurly", "SeparatorWrap",
             "SingleSpaceSeparator", "TrailingComment", "WhitespaceAfter", "WhitespaceAround", "NewlineAtEndOfFile", "AnnotationLocation", 
             "AnnotationOnSameLine", "EmptyForInitializerPad", "TypecastParenPad"]
 
+result = ",".join(violationRules)
+print(f"project_name,{result}")
 
 violationCountDict = {}
 for i in violationRules:
@@ -32,6 +36,10 @@ for proj in projs:
     infoFile = os.path.join(projDir, "violations", "info.json")
     if not os.path.exists(checkstyleFile) or not os.path.exists(infoFile):
         continue
+
+    proj_violation_dict = {}
+    for i in violationRules:
+        proj_violation_dict[i] = 0
 
 # from bs4 import BeautifulSoup
 #     # with open(checkstyleFile, "r") as f:
@@ -65,6 +73,7 @@ for proj in projs:
                 violationSet.add(rule)
                 violationID = violationCountDict[rule]
                 violationCountDict[rule] += 1
+                proj_violation_dict[rule] += 1
                 ruleDir = os.path.join(outputDir, rule, str(violationID))
                 os.mkdir(ruleDir)
                 shutil.copy(javaFile, os.path.join(ruleDir, javaFilename))
@@ -74,7 +83,10 @@ for proj in projs:
                 info = {"checkstyle_jar": info["checkstyle_jar"], "repo": proj, "fileID": _id, "filename": javaFilename}
                 with open(os.path.join(ruleDir, "info.json"), "w") as f:
                     json.dump(info, f)
-
+    
+    result = [str(proj_violation_dict[rule]) for rule in violationRules]
+    result = ",".join(result)
+    print(f"{proj},{result}")
     # for commit in os.listdir(projDir):
     #     commitPath = os.path.join(projDir, commit)
     #     if not os.path.isdir(commitPath): continue
