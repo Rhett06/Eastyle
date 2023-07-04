@@ -3,7 +3,7 @@ from .utils import locate_token, next_nl
 
 
 def fixNoWhitespaceAfter(violation: dict, tokens: list, whitespace: list, checkstyleData: BeautifulSoup, **kwargs) -> list:
-    print(violation)
+    # print(violation)
     line = int(violation["line"])
     col = int(violation["column"])
     token_id = locate_token(tokens, line, col)

@@ -22,3 +22,4 @@ from .TrailingComment import fixTrailingComment
 from .WhitespaceAround import fixWhitespaceAround
 from .AnnotationLocation import fixAnnotationLocation
 from .TypecastParenPad import fixTypecastParenPad
+from .AnnotationOnSameLine import fixAnnotationOnSameLine
