@@ -24,11 +24,11 @@ def fixNoWhitespaceAfter(violation: dict, tokens: list, whitespace: list, checks
 
     if whitespace[token_id][0] > 0:
         indent = whitespace[token_id][1]
-        whitespace[token_id] = (0, 0, whitespace[token_id][2])
+        whitespace[token_id] = (0, 0, "None")
         nl_id = next_nl(whitespace, token_id)
         if nl_id:
             whitespace[nl_id] = (whitespace[nl_id][0], whitespace[nl_id][1]+indent, whitespace[nl_id][2])
     else:
-        whitespace[token_id] = (0, 0, whitespace[token_id][2])
+        whitespace[token_id] = (0, 0, "None")
 
     return whitespace

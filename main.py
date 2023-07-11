@@ -57,7 +57,9 @@ def fix_violations_step(code: str, violations: list, checkstyleData: BeautifulSo
     # print(code)
     return code
 
-def fix_violations(code: str, violations: list, checkstyleData: BeautifulSoup, steps: int = 3, tempCodeFile = None) -> Tuple[Union[str, None], list]:
+
+def fix_violations(code: str, violations: list, checkstyleData: BeautifulSoup, steps: int = 3,
+                   tempCodeFile = None, checkstyleJar: str = None, checkstyleConfigFile: str=None) -> Tuple[Union[str, None], list]:
     # TODO: expose an interface to users
     if not tempCodeFile:
         tempCodeFile = os.path.join(tempDir, info["filename"])  # TODO: generate an output path
@@ -127,16 +129,16 @@ if __name__ == "__main__":
         print(f"running with rule {rule}...")
         rulePath = os.path.join(dataPath, rule)
         dataset = os.listdir(rulePath)
-        dataset = [os.path.join(rulePath, i) for i in dataset]
+        dataset = sorted(dataset)
         # import random
         # random.shuffle(dataset)
         # dataset = dataset[:1]
         # print(dataset)
         # dataset = ["../data-by-rule/FileTabCharacter/218"]  # 174 173  142 80 74 143
-        dataset = sorted(dataset)
+
         start_id = result[rule]["total"]
         for idx in tqdm.tqdm(range(start_id, len(dataset))):
-            data = dataset[idx]
+            data = os.path.join(rulePath, dataset[idx])
             checkstyleConfigFile = os.path.join(data, "checkstyle.xml")
             infoFile = os.path.join(data, "info.json")
             violationFile = os.path.join(data, "violations.json")
@@ -157,7 +159,7 @@ if __name__ == "__main__":
 
             codeFile = os.path.join(data, info["filename"])
 
-            output_dir = os.path.join(tempDir, dataset_name, rule, str(idx))
+            output_dir = os.path.join(tempDir, dataset_name, rule, dataset[idx])
             os.makedirs(output_dir, exist_ok=True)
             output_dir = os.path.join(output_dir, info["filename"])
 
@@ -174,7 +176,8 @@ if __name__ == "__main__":
             init_violations = violations
 
             start_time = time.time()
-            new_code, remaining = fix_violations(code, violations, checkstyleData, 10 * len(violations), output_dir)
+            new_code, remaining = fix_violations(code, violations, checkstyleData, 10 * len(violations), output_dir,
+                                                checkstyleJar=checkstyleJar, checkstyleConfigFile=checkstyleConfigFile)
             end_time = time.time()
 
             # print(remaining)
@@ -191,6 +194,7 @@ if __name__ == "__main__":
                 print("error on data point: ", data, file=sys.stderr)
                 result[rule]["error"] += 1
             elif len(remaining) == 0:
+                fix_time[rule].append((idx, end_time - start_time))
                 result[rule]["success"] += 1
             else:
                 print(data, [get_violation_type(i) for i in remaining], file=sys.stderr)
@@ -203,13 +207,14 @@ if __name__ == "__main__":
                     result[rule]["new"] += 1
 
             result[rule]["total"] += 1
-            fix_time[rule].append((idx, end_time - start_time))
+
             if args.checkpoint and idx % 100 == 99:
                 with open(args.checkpoint, "wb") as f:
                     pkl.dump([result, fix_time], f)
 
                 t = [j for i, j in fix_time[rule]]
-                print(f"saved {idx}, ", result[rule], min(t), max(t), sum(t) / len(t))
+                if len(t) > 0:
+                    print(f"saved {idx}, ", result[rule], min(t), max(t), sum(t) / len(t))
 
         if args.checkpoint:
             with open(args.checkpoint, "wb") as f:
