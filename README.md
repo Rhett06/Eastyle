@@ -1,4 +1,4 @@
-# Master-Project
+# Eastyler
 ## Dataset directory
 dataset1: https://drive.google.com/file/d/18xKLWtXWwH0bswrAvZw2Wq8sYiaG3Tqu/view?usp=sharing
 
