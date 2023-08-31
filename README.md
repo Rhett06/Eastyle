@@ -1,12 +1,13 @@
-# Master-Project
+# Eastyle
 ## Dataset directory
 dataset1: https://drive.google.com/file/d/18xKLWtXWwH0bswrAvZw2Wq8sYiaG3Tqu/view?usp=sharing
 
 dataset2: https://drive.google.com/file/d/1KS7jiPkw1kV48dD6SKQp-qjm6_kT5AwM/view?usp=sharing
 
-dataset3: https://drive.google.com/file/d/1Jf42YU8IparoeQ8ab2tkd9hKnmvi6IiD/view?usp=sharing
+dataset3: https://drive.google.com/file/d/1nT9-VTNwwpAiODyr4hl1IxntGOnD1HlA/view?usp=drive_link
 
 test data: https://drive.google.com/file/d/1eKxGEe4Q4_emHNm568bJ55mVA-XpxeVQ/view?usp=drive_link
+
 ## Run this project
 Run all files for dataset 1 and 3:
 ```
