@@ -17,7 +17,7 @@ def check(codeFile: str, checkstyleConfigFile: str, checkstyleJar: str = None) -
                 f.write(binary.content)
 
     cmd = ["java", "-jar", checkstyleJar, "-f", "xml", "-c", checkstyleConfigFile, codeFile]
-    process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output = process.communicate()[0]
     output = BeautifulSoup(output, "xml").find("file")
     ret = []

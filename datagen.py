@@ -2,15 +2,23 @@ import os
 import json
 import shutil
 
-dataDir = "../data"
-outputDir = "../data-by-rule"
+dataDir = "../data-2"
+outputDir = "../data-by-rule-2"
 if not os.path.exists(outputDir):
     os.mkdir(outputDir)
 
+
 violationRules = ["CommentsIndentation", "EmptyForIteratorPad", "EmptyLineSeparator", "FileTabCharacter", "GenericWhitespace", "Indentation", 
             "LeftCurly", "LineLength", "MethodParamPad", "NoLineWrap", "NoWhitespaceAfter", "NoWhitespaceBefore", "OneStatementPerLine",
-            "OperatorWrap", "ParenPad", "Regexp", "RegexpMultiline", "RegexpSingleline", "RegexpSinglelineJava", "RightCurly", "SeparatorWrap",
-            "SingleSpaceSeparator", "TrailingComment", "WhitespaceAfter", "WhitespaceAround", "NewlineAtEndOfFile"]
+            "OperatorWrap", "ParenPad", 
+            "Regexp", "RegexpMultiline", "RegexpSingleline", "RegexpSinglelineJava",
+            "RightCurly", "SeparatorWrap",
+            "SingleSpaceSeparator", "TrailingComment", "WhitespaceAfter", "WhitespaceAround", "NewlineAtEndOfFile", "AnnotationLocation", 
+            "AnnotationOnSameLine", "EmptyForInitializerPad", "TypecastParenPad"]
+
+result = ",".join(violationRules)
+print(f"project_name,{result}")
+
 violationCountDict = {}
 for i in violationRules:
     violationCountDict[i] = 0
@@ -24,9 +32,14 @@ for proj in projs:
     projDir = os.path.join(dataDir, proj)
 
     checkstyleFile = os.path.join(projDir, "checkstyle.xml")
-    infoFile = os.path.join(projDir, "info.json")
+    # infoFile = os.path.join(projDir, "info.json")
+    infoFile = os.path.join(projDir, "violations", "info.json")
     if not os.path.exists(checkstyleFile) or not os.path.exists(infoFile):
         continue
+
+    proj_violation_dict = {}
+    for i in violationRules:
+        proj_violation_dict[i] = 0
 
 # from bs4 import BeautifulSoup
 #     # with open(checkstyleFile, "r") as f:
@@ -39,36 +52,69 @@ for proj in projs:
     with open(infoFile, "r") as f:
         info = json.load(f)
     
+    violationPath = os.path.join(projDir, "violations")
+    if not os.path.isdir(violationPath): continue
+    violationList = [i for i in os.listdir(violationPath) if i.isdigit()]
+    for _id in violationList:
+        id = os.path.join(violationPath, _id)
+        metaFile = os.path.join(id, "metadata.json")
+        javaFilename = [i for i in os.listdir(id) if i.endswith("java")][0]
+        javaFile = os.path.join(id, javaFilename)
+        violationSet = set()
+        try:
+            with open(metaFile, "r") as f:
+                violations = json.load(f)["violations"]
+        except Exception:
+            continue
 
+        for violation in violations:
+            rule = violation["source"].split(".")[-1][:-5]
+            if rule in violationCountDict and rule not in violationSet:
+                violationSet.add(rule)
+                violationID = violationCountDict[rule]
+                violationCountDict[rule] += 1
+                proj_violation_dict[rule] += 1
+                ruleDir = os.path.join(outputDir, rule, str(violationID))
+                os.mkdir(ruleDir)
+                shutil.copy(javaFile, os.path.join(ruleDir, javaFilename))
+                with open(os.path.join(ruleDir, "violations.json"), "w") as f:
+                    json.dump(violations, f)
+                shutil.copy(checkstyleFile, os.path.join(ruleDir, "checkstyle.xml"))
+                info = {"checkstyle_jar": info["checkstyle_jar"], "repo": proj, "fileID": _id, "filename": javaFilename}
+                with open(os.path.join(ruleDir, "info.json"), "w") as f:
+                    json.dump(info, f)
+    
+    result = [str(proj_violation_dict[rule]) for rule in violationRules]
+    result = ",".join(result)
+    print(f"{proj},{result}")
+    # for commit in os.listdir(projDir):
+    #     commitPath = os.path.join(projDir, commit)
+    #     if not os.path.isdir(commitPath): continue
+    #     violationList = os.listdir(commitPath)
+    #     for _id in violationList:
+    #         id = os.path.join(commitPath, _id)
+    #         violationFile = os.path.join(id, "violations.json")
+    #         javaFile = [i for i in os.listdir(id) if i.endswith("java")][0]
+    #         javaFile = os.path.join(id, javaFile)
+    #         violationSet = set()
+    #         try:
+    #             with open(violationFile, "r") as f:
+    #                 violations = json.load(f)
+    #         except Exception:
+    #             continue
 
-    for commit in os.listdir(projDir):
-        commitPath = os.path.join(projDir, commit)
-        if not os.path.isdir(commitPath): continue
-        violationList = os.listdir(commitPath)
-        for _id in violationList:
-            id = os.path.join(commitPath, _id)
-            violationFile = os.path.join(id, "violations.json")
-            javaFile = [i for i in os.listdir(id) if i.endswith("java")][0]
-            javaFile = os.path.join(id, javaFile)
-            violationSet = set()
-            try:
-                with open(violationFile, "r") as f:
-                    violations = json.load(f)
-            except Exception:
-                continue
-
-            for violation in violations:
-                rule = violation["source"].split(".")[-1][:-5]
-                if rule in violationCountDict and rule not in violationSet:
-                    violationSet.add(rule)
-                    violationID = violationCountDict[rule]
-                    violationCountDict[rule] += 1
-                    ruleDir = os.path.join(outputDir, rule, str(violationID))
-                    os.mkdir(ruleDir)
-                    shutil.copy(javaFile, os.path.join(ruleDir, "code.java"))
-                    shutil.copy(violationFile, os.path.join(ruleDir, "violations.json"))
-                    shutil.copy(checkstyleFile, os.path.join(ruleDir, "checkstyle.xml"))
-                    info = {"checkstyle_jar": info["checkstyle_jar"], "repo": proj, "commit": commit, "fileID": _id}
-                    with open(os.path.join(ruleDir, "info.json"), "w") as f:
-                        json.dump(info, f)
+    #         for violation in violations:
+    #             rule = violation["source"].split(".")[-1][:-5]
+    #             if rule in violationCountDict and rule not in violationSet:
+    #                 violationSet.add(rule)
+    #                 violationID = violationCountDict[rule]
+    #                 violationCountDict[rule] += 1
+    #                 ruleDir = os.path.join(outputDir, rule, str(violationID))
+    #                 os.mkdir(ruleDir)
+    #                 shutil.copy(javaFile, os.path.join(ruleDir, "code.java"))
+    #                 shutil.copy(violationFile, os.path.join(ruleDir, "violations.json"))
+    #                 shutil.copy(checkstyleFile, os.path.join(ruleDir, "checkstyle.xml"))
+    #                 info = {"checkstyle_jar": info["checkstyle_jar"], "repo": proj, "commit": commit, "fileID": _id}
+    #                 with open(os.path.join(ruleDir, "info.json"), "w") as f:
+    #                     json.dump(info, f)
 

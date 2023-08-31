@@ -4,3 +4,8 @@ data
 env
 temp
 **/*.jar
+**/*.java
+target
+.idea
+checkpoint-backup.pkl
+result.txt

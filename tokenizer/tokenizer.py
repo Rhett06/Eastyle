@@ -22,6 +22,7 @@ def tokenize_with_white_space(code: str) -> Tuple[list, list, list]:
     javalang_tokens = javalang_tokenizer.tokenize(code, parse_comments=True)
     tokens = []
     count = 0
+    nl_space_type = "None"
     try:
         for t in javalang_tokens:
             count += 1
@@ -34,14 +35,28 @@ def tokenize_with_white_space(code: str) -> Tuple[list, list, list]:
         return None, None
     whitespace = list()
     whitespaceStr = []
+    #print(tokens)
     for index in range(0, len(tokens)-1):
         tokens_position = tokens[index].position
         next_token_position = tokens[index+1].position
-        end_of_token = (tokens_position[0], tokens_position[1] + len(tokens[index].value))
+        if tokens_position[0] == 1:
+            tokens_position = (1, tokens_position[1]+1)
+        if next_token_position[0] == 1:
+            next_token_position = (1, next_token_position[1]+1)
+
+        token_lines = tokens[index].value.split("\n")
+        end_of_token_line = tokens_position[0] + len(token_lines) - 1
+        end_of_token_col = (tokens_position[1] + len(token_lines[0]))  if (len(token_lines)==1) else (len(token_lines[-1]) + 1)
+        end_of_token = (end_of_token_line, end_of_token_col)
+
+
         if end_of_token == next_token_position:
             whitespace.append((0,0,'None'))
             whitespaceStr.append('')
+            # whitespaceStr.append((tokens_position, end_of_token))
         else:
+            # if tokens[index].value.startswith("/* TODO: (?) add a dedica"):
+            #     print(tokens[index+1])
             if end_of_token[0] == next_token_position[0]:
                 # same line
                 if file_content_lines[tokens_position[0]-1] != '':
@@ -53,21 +68,25 @@ def tokenize_with_white_space(code: str) -> Tuple[list, list, list]:
                     space_type = 'None'
                 whitespace.append(( 0, next_token_position[1] - end_of_token[1], space_type))
                 whitespaceStr.append(file_content_lines[tokens_position[0]-1][end_of_token[1]-1:next_token_position[1]-1])
+
             else:
                 # new line
                 new_line = file_content_lines[next_token_position[0]-1]
                 if new_line != '':
                     if new_line[get_line_indent(new_line) - 1] == '\t':
                         space_type = 'TB'
-                    else:
+                    elif new_line[get_line_indent(new_line) - 1] == ' ':
                         space_type = 'SP'
+                    else:
+                        space_type = nl_space_type
                 else:
                     space_type = 'None'
+                nl_space_type = space_type
                 if True: # relative
                     spaces = next_token_position[1] - indentation_last_line
-                    whitespace.append((next_token_position[0] - end_of_token[0] - tokens[index].value.count('\n'), spaces, space_type))
-                    temp = file_content_lines[tokens_position[0]-1][end_of_token[1]-1:] + "\n"
-                    for i in range(tokens_position[0], next_token_position[0]-1):
+                    whitespace.append((next_token_position[0] - end_of_token[0], spaces, space_type))
+                    temp = file_content_lines[end_of_token[0]-1][end_of_token[1]-1:] + "\n"
+                    for i in range(end_of_token[0], next_token_position[0]-1):
                         temp += file_content_lines[i] + "\n"
                     temp += file_content_lines[next_token_position[0]-1][:next_token_position[1]-1]
                     whitespaceStr.append(temp)
@@ -235,8 +254,8 @@ def reformat(whitespace: list, violating_whitespace: list, tokens: list, whitesp
 
 def de_tokenize(code: str, fixedWihtespaces: list) -> str:
     violatingWihtespaces, tokens, wihtespaceStr = tokenize_with_white_space(code)
-    # for a,b in zip(violatingWihtespaces, wihtespaceStr):
-    #     print(a, "*"+b+"*")
+    # for a,b,c in zip(violatingWihtespaces,tokens, wihtespaceStr):
+    #     print(a, b, "*"+c+"*")
     fixedSourceCode = reformat(fixedWihtespaces, violatingWihtespaces, tokens, wihtespaceStr)
     # print(fixedTokens)
     return fixedSourceCode
